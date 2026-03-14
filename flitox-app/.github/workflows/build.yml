@@ -18,14 +18,23 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        run: |
+          cd flitox-app
+          cat > gradlew << 'GRADLEW'
+          #!/bin/sh
+          DIRNAME=$(dirname "$0")
+          exec gradle -p "$DIRNAME" "$@"
+          GRADLEW
+          chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: |
+          cd flitox-app
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: FLITOX-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: flitox-app/app/build/outputs/apk/debug/app-debug.apk
