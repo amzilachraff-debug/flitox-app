@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FLITOX — محوّل PDF العربي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #0C0C0C;
+  --bg2:     #111111;
+  --card:    #161616;
+  --card2:   #1C1C1C;
+  --border:  rgba(255,255,255,.08);
+  --border2: rgba(255,255,255,.14);
+  --gold:    #C9A96E;
+  --gold2:   #E8C98A;
+  --cream:   #F5F0E8;
+  --txt:     #F0EDE8;
+  --txt2:    #8A8680;
+  --txt3:    #4A4744;
+  --r:       2px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ══ CITY OVERLAY — hero bg ══ */
+.hero-bg {
+  position:absolute;inset:0;z-index:0;
+  background:
+    linear-gradient(to bottom, rgba(12,12,12,0) 0%, rgba(12,12,12,.6) 60%, rgba(12,12,12,1) 100%),
+    linear-gradient(to right, rgba(12,12,12,.3) 0%, transparent 50%, rgba(12,12,12,.3) 100%);
+}
+/* city lights simulation */
+.hero-bg::before {
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 70%, rgba(201,169,110,.04) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 80%, rgba(100,120,180,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(180,100,100,.04) 0%, transparent 60%);
+}
+/* building silhouettes */
+.hero-bg::after {
+  content:'';position:absolute;bottom:0;left:0;right:0;height:45%;
+  background:
+    /* buildings */
+    linear-gradient(transparent 0%, transparent 30%,
+      #0C0C0C 30%, #0C0C0C 31%,
+      transparent 31%, transparent 40%,
+      #0C0C0C 40%, #0C0C0C 41%
+    );
+  opacity:.8;
+}
+
+/* scattered lights */
+.lights {
+  position:absolute;inset:0;overflow:hidden;
+}
+.lights span {
+  position:absolute;border-radius:50%;
+  background:rgba(201,169,110,.6);
+  animation:twinkle var(--d,3s) var(--del,0s) ease-in-out infinite;
+}
+@keyframes twinkle{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+
+/* ══ LAYOUT ══ */
+.wrap{max-width:1080px;margin:0 auto;padding:0 48px}
+
+/* ══ NAV ══ */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  transition:background .3s;
+}
+nav.scrolled {
+  background:rgba(12,12,12,.95);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 0;
+}
+.logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;font-weight:600;letter-spacing:6px;
+  color:var(--cream);text-decoration:none;text-transform:uppercase;
+}
+.logo em{color:var(--gold);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:36px}
+.nav-link{font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--gold)}
+.nav-btn {
+  font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+  padding:11px 26px;border:1px solid var(--gold);color:var(--gold);
+  text-decoration:none;border-radius:var(--r);transition:all .2s;
+}
+.nav-btn:hover{background:var(--gold);color:var(--bg)}
+
+/* ══ HERO ══ */
+.hero-section {
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  background:#0A0A0F;
+}
+.hero-content {
+  position:relative;z-index:2;
+  text-align:center;padding:120px 24px 80px;
+  max-width:820px;margin:0 auto;
+}
+.hero-eyebrow {
+  font-size:11px;font-weight:500;letter-spacing:4px;
+  text-transform:uppercase;color:var(--gold);
+  margin-bottom:24px;display:block;
+}
+.hero h1 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(52px,7vw,96px);
+  font-weight:300;line-height:1.0;
+  letter-spacing:-1px;margin-bottom:28px;
+  color:var(--cream);
+}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero p{
+  font-size:15px;font-weight:300;letter-spacing:.5px;
+  color:var(--txt2);line-height:1.9;max-width:520px;margin:0 auto 48px;
+}
+.hero-cta{display:flex;align-items:center;justify-content:center;gap:16px}
+.btn-gold {
+  padding:15px 38px;font-size:11px;font-weight:600;letter-spacing:2.5px;
+  text-transform:uppercase;background:var(--gold);color:var(--bg);
+  border:none;border-radius:var(--r);cursor:pointer;
+  font-family:'Tajawal',sans-serif;transition:all .25s;text-decoration:none;
+}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-ghost-gold {
+  padding:15px 34px;font-size:11px;font-weight:600;letter-spacing:2.5px;
+  text-transform:uppercase;background:transparent;color:var(--gold);
+  border:1px solid rgba(201,169,110,.4);border-radius:var(--r);
+  cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;text-decoration:none;
+}
+.btn-ghost-gold:hover{border-color:var(--gold);background:rgba(201,169,110,.06)}
+
+/* scroll hint */
+.scroll-hint{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);
+}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,transparent,var(--gold));animation:scrollanim 2s ease infinite}
+@keyframes scrollanim{0%,100%{transform:scaleY(1);opacity:.5}50%{transform:scaleY(.6);opacity:1}}
+
+/* ══ STATS ══ */
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.stat-cell{
+  padding:36px 24px;text-align:center;
+  border-right:1px solid var(--border);
+  position:relative;transition:background .3s;
+}
+.stat-cell:last-child{border-right:none}
+.stat-cell:hover{background:rgba(201,169,110,.02)}
+.stat-cell::after{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:0;height:1px;background:var(--gold);transition:width .4s;
+}
+.stat-cell:hover::after{width:40%}
+.stat-n{
+  font-family:'Cormorant Garamond',serif;
+  font-size:44px;font-weight:300;color:var(--gold);
+  line-height:1;margin-bottom:8px;
+}
+.stat-l{font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--txt2)}
+
+/* ══ SECTION ══ */
+.section{padding:100px 0;border-bottom:1px solid var(--border)}
+.sec-tag{
+  display:inline-flex;align-items:center;gap:12px;
+  font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.sec-tag::before{content:'';width:28px;height:1px;background:var(--gold)}
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(32px,4vw,56px);font-weight:300;
+  line-height:1.1;margin-bottom:14px;letter-spacing:-.5px;
+}
+.sec-title em{font-style:italic;color:var(--gold)}
+.sec-sub{font-size:14px;font-weight:300;color:var(--txt2);line-height:1.9;max-width:520px}
+
+/* ══ HOW ══ */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:60px}
+.how-card{
+  background:var(--bg);padding:48px 36px;
+  transition:background .3s;position:relative;overflow:hidden;
+}
+.how-card:hover{background:var(--card)}
+.how-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:transparent;transition:background .4s;
+}
+.how-card:hover::before{background:var(--gold)}
+.how-step{
+  font-family:'Cormorant Garamond',serif;
+  font-size:72px;font-weight:300;color:rgba(201,169,110,.07);
+  line-height:1;margin-bottom:24px;display:block;
+  transition:color .3s;
+}
+.how-card:hover .how-step{color:rgba(201,169,110,.12)}
+.how-icon-box{
+  width:48px;height:48px;border:1px solid var(--border2);
+  border-radius:var(--r);display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:20px;background:var(--card2);
+  transition:border-color .3s;
+}
+.how-card:hover .how-icon-box{border-color:var(--gold)}
+.how-card h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:500;margin-bottom:10px;letter-spacing:.3px;
+}
+.how-card p{font-size:13px;font-weight:300;color:var(--txt2);line-height:1.8}
+
+/* ══ APP SECTION ══ */
+#app{padding:100px 0}
+.app-grid{display:grid;grid-template-columns:300px 1fr;gap:40px;margin-top:60px}
+
+/* sidebar */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;margin-bottom:16px;
+}
+.panel-head{
+  padding:14px 20px;background:var(--card2);
+  border-bottom:1px solid var(--border);
+  font-size:10px;font-weight:600;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--txt2);
+  display:flex;align-items:center;gap:10px;
+}
+.panel-head::before{content:'';width:14px;height:1px;background:var(--gold)}
+.panel-body{padding:20px}
+
+/* lang */
+.lang-list{display:flex;flex-direction:column;gap:8px}
+.lang-item{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 14px;border:1px solid var(--border);
+  border-radius:var(--r);background:var(--card2);
+  cursor:pointer;transition:all .2s;
+}
+.lang-item:hover{border-color:var(--gold);background:rgba(201,169,110,.04)}
+.lang-item.active{border-color:var(--gold);background:rgba(201,169,110,.06)}
+.lang-flag{font-size:22px}
+.lang-info .ln{font-size:14px;font-weight:500}
+.lang-info .ls{font-size:11px;color:var(--txt2);margin-top:1px}
+.lang-item.active .ln{color:var(--gold)}
+.lang-check{
+  margin-right:auto;width:18px;height:18px;border-radius:50%;
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;transition:all .2s;
+}
+.lang-item.active .lang-check{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+
+/* fields */
+.fld{margin-bottom:14px}
+.fld:last-child{margin-bottom:0}
+.fld label{
+  display:block;font-size:10px;font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;color:var(--txt2);margin-bottom:8px;
+}
+.fld input,.fld select{
+  width:100%;background:var(--card2);border:1px solid var(--border);
+  border-radius:var(--r);padding:11px 14px;color:var(--txt);
+  font-size:14px;font-family:'Tajawal',sans-serif;
+  outline:none;text-align:center;transition:border-color .2s;
+}
+.fld input:focus,.fld select:focus{border-color:var(--gold)}
+.fld select option{background:var(--card)}
+
+/* main */
+.upzone{
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:56px 32px;text-align:center;cursor:pointer;
+  background:var(--card);transition:all .25s;position:relative;
+  margin-bottom:16px;
+}
+.upzone:hover,.upzone.drag{
+  border-color:var(--gold);background:rgba(201,169,110,.03);
+}
+.upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.up-circle{
+  width:64px;height:64px;border-radius:50%;
+  border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:26px;
+  background:var(--card2);transition:border-color .3s;
+}
+.upzone:hover .up-circle{border-color:var(--gold)}
+.upzone h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;font-weight:400;margin-bottom:8px;
+  letter-spacing:.3px;
+}
+.upzone p{font-size:13px;font-weight:300;color:var(--txt2)}
+.file-ok{
+  display:none;margin-top:16px;padding:11px 18px;
+  background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.25);
+  border-radius:var(--r);font-size:13px;color:var(--gold);font-weight:500;
+}
+
+.btn-start{
+  width:100%;padding:17px;font-size:11px;font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;
+  background:var(--gold);color:var(--bg);border:none;border-radius:var(--r);
+  cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .25s;
+  position:relative;overflow:hidden;
+}
+.btn-start:hover:not(:disabled){background:var(--gold2);transform:translateY(-1px)}
+.btn-start:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.btn-start .sh{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:translateX(-100%);animation:sh 3s infinite}
+@keyframes sh{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
+
+/* progress */
+.prog{
+  display:none;margin-top:14px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:22px;
+}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.prog-lbl{font-size:12px;font-weight:500;letter-spacing:.5px;color:var(--txt2)}
+.prog-pct{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;font-weight:400;color:var(--gold);
+}
+.prog-bar{height:1px;background:var(--border2);margin-bottom:14px;overflow:hidden}
+.prog-fill{height:100%;background:var(--gold);transition:width .4s ease;width:0%}
+.prog-msg{font-size:12px;font-weight:300;color:var(--txt3);display:flex;align-items:center;gap:8px}
+.spin{width:12px;height:12px;border:1px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* results */
+.res{display:none;margin-top:14px}
+.res-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.res-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:400;letter-spacing:.3px;
+}
+.res-ok{
+  font-size:10px;font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;padding:6px 14px;
+  border:1px solid rgba(201,169,110,.3);color:var(--gold);
+  border-radius:var(--r);
+}
+
+.mini-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;margin-bottom:14px;background:var(--border);gap:1px;
+}
+.ms{background:var(--card);padding:16px;text-align:center}
+.ms .n{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;color:var(--gold)}
+.ms .l{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-top:3px}
+
+.act{display:flex;gap:10px;margin-bottom:14px}
+.btn-act-gold{
+  flex:2;padding:13px;font-size:11px;font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;background:var(--gold);color:var(--bg);
+  border:none;border-radius:var(--r);cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;
+}
+.btn-act-gold:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-act{
+  flex:1;padding:13px;font-size:11px;font-weight:600;letter-spacing:1.5px;
+  text-transform:uppercase;background:transparent;
+  border:1px solid var(--border2);border-radius:var(--r);
+  cursor:pointer;color:var(--txt2);font-family:'Tajawal',sans-serif;transition:all .2s;
+}
+.btn-act:hover{border-color:var(--gold);color:var(--gold)}
+
+/* page cards */
+.pg-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);margin-bottom:10px;overflow:hidden;animation:fu .3s ease;
+}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pg-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 16px;background:var(--card2);border-bottom:1px solid var(--border);
+}
+.pg-n{font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3)}
+.pg-dot-wrap{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--txt3)}
+.pg-dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.pg-dot.w{background:#C9A96E;opacity:.5}.pg-dot.e{background:#E88080}
+.pg-txt{
+  width:100%;padding:16px 18px;font-size:15px;line-height:2;
+  background:transparent;border:none;outline:none;resize:vertical;
+  font-family:'Tajawal',sans-serif;min-height:70px;color:var(--txt);
+  font-weight:300;
+}
+
+/* ══ FEATURES ══ */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:60px}
+.feat{
+  padding:40px 32px;border:1px solid var(--border);border-radius:var(--r);
+  transition:all .3s;position:relative;background:var(--card);
+}
+.feat:hover{border-color:rgba(201,169,110,.25);background:var(--card2)}
+.feat-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:13px;font-weight:400;color:var(--gold);
+  letter-spacing:1px;margin-bottom:20px;display:block;
+}
+.feat-icon{
+  font-size:28px;margin-bottom:16px;display:block;
+  filter:sepia(1) saturate(.5) brightness(.9);
+}
+.feat h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:500;margin-bottom:10px;
+}
+.feat p{font-size:13px;font-weight:300;color:var(--txt2);line-height:1.8}
+.feat::after{
+  content:'';position:absolute;bottom:0;left:32px;right:32px;
+  height:1px;background:transparent;transition:background .3s;
+}
+.feat:hover::after{background:var(--gold)}
+
+/* ══ DIVIDER ══ */
+.divider{
+  display:flex;align-items:center;gap:16px;
+  padding:48px 0;opacity:.3;
+}
+.divider-line{flex:1;height:1px;background:var(--gold)}
+.divider-diamond{
+  width:8px;height:8px;background:var(--gold);
+  transform:rotate(45deg);flex-shrink:0;
+}
+
+/* ══ FOOTER ══ */
+footer{padding:56px 0 40px;border-top:1px solid var(--border)}
+.footer-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:48px;margin-bottom:48px;
+}
+.footer-brand .ft-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;font-weight:500;letter-spacing:6px;
+  color:var(--cream);text-transform:uppercase;margin-bottom:12px;
+}
+.footer-brand .ft-logo em{color:var(--gold);font-style:normal}
+.footer-brand p{font-size:13px;font-weight:300;color:var(--txt2);line-height:1.8}
+.footer-col h4{
+  font-size:10px;font-weight:600;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:18px;
+}
+.footer-col a{
+  display:block;font-size:13px;font-weight:300;color:var(--txt2);
+  text-decoration:none;margin-bottom:10px;transition:color .2s;
+}
+.footer-col a:hover{color:var(--gold)}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:32px;border-top:1px solid var(--border);
+  font-size:12px;font-weight:300;color:var(--txt3);
+}
+.footer-bottom span{color:var(--gold)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(70px);
+  background:var(--card2);border:1px solid rgba(201,169,110,.2);
+  padding:12px 24px;border-radius:var(--r);font-size:13px;
+  font-weight:400;letter-spacing:.3px;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  z-index:999;white-space:nowrap;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){
+  .app-grid{grid-template-columns:1fr}
+  .sidebar-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .how-grid,.feat-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .stat-cell:nth-child(2){border-right:none}
+  .stat-cell:nth-child(3){border-top:1px solid var(--border)}
+  .hero h1{font-size:52px}
+  .wrap{padding:0 24px}
+  .nav-links{display:none}
+}
+@media(max-width:560px){
+  .sidebar-wrap{grid-template-columns:1fr}
+  .act{flex-wrap:wrap}
+  .btn-act-gold{flex:100%}
+  .mini-stats{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="navbar">
+  <div class="wrap">
+    <div class="nav-inner">
+      <a class="logo" href="#">FLI<em>TOX</em></a>
+      <div class="nav-links">
+        <a class="nav-link" href="#how">كيف يعمل</a>
+        <a class="nav-link" href="#app">تحويل</a>
+        <a class="nav-link" href="#features">المميزات</a>
+        <a class="nav-btn" href="#app">ابدأ مجاناً</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero-section">
+  <div class="hero-bg"></div>
+
+  <!-- city lights -->
+  <div class="lights" id="lights"></div>
+
+  <div class="hero-content">
+    <span class="hero-eyebrow">معالجة المستندات بالذكاء الاصطناعي</span>
+    <h1>
+      حوّل ملفات PDF<br/>
+      إلى نص قابل<br/>
+      <em>للتعديل.</em>
+    </h1>
+    <div class="hero-cta">
+      <a href="#app" class="btn-gold">ابدأ التحويل الآن</a>
+      <a href="#how" class="btn-ghost-gold">كيف يعمل؟</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>اسحب للأسفل</span>
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<div class="wrap">
+  <div class="stats-row">
+    <div class="stat-cell"><div class="stat-n">$0</div><div class="stat-l">مجاني للأبد</div></div>
+    <div class="stat-cell"><div class="stat-n">3</div><div class="stat-l">لغة</div></div>
+    <div class="stat-cell"><div class="stat-n">∞</div><div class="stat-l">صفحات بلا حدود</div></div>
+    <div class="stat-cell"><div class="stat-n">100%</div><div class="stat-l">خصوصية تامة</div></div>
+  </div>
+</div>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="sec-tag">كيف يعمل</div>
+    <div class="sec-title">ثلاث خطوات.<br/><em>صفر تعقيد.</em></div>
+    <div class="sec-sub">كل شيء يحدث داخل متصفحك ,لا خوادم، لا رفع، لا بيانات محفوظة.</div>
+    <div class="how-grid">
+      <div class="how-card">
+        <span class="how-step">01</span>
+        <div class="how-icon-box">📂</div>
+        <h3>ارفع ملف PDF</h3>
+        <p>اسحب أي ملف PDF عربي — أطروحة، كتاب، تقرير. أي حجم، أي نوع. يبقى على جهازك فقط.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-step">02</span>
+        <div class="how-icon-box">🔍</div>
+        <h3>OCR يقرأ كل صفحة</h3>
+        <p>Tesseract يحوّل كل صفحة لصورة ويستخرج النص العربي بدقة — محلياً في متصفحك.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-step">03</span>
+        <div class="how-icon-box">📄</div>
+        <h3>حمّل ملف Word</h3>
+        <p>راجع النص المستخرج وعدّله مباشرة، ثم حمّل ملف .doc منسق بشكل صحيح مع اتجاه RTL.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ APP ══ -->
+<section id="app" style="padding:100px 0;border-bottom:1px solid var(--border)">
+  <div class="wrap">
+    <div class="sec-tag">المحوّل</div>
+    <div class="sec-title">حوّل مستندك<br/><em>الآن.</em></div>
+
+    <div class="app-grid">
+
+      <!-- SIDEBAR -->
+      <div class="sidebar-wrap">
+
+        <!-- INFO -->
+        <div class="panel">
+          <div class="panel-head">اللغة</div>
+          <div class="panel-body" style="font-size:14px;color:var(--txt2);line-height:1.85">
+            🇲🇦 &nbsp; النص يُستخرج <strong style="color:var(--cream)">بالعربية</strong> دائماً مع اتجاه RTL صحيح.
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="panel">
+          <div class="panel-head">الإعدادات</div>
+          <div class="panel-body">
+            <div class="fld">
+              <label>من صفحة</label>
+              <input type="number" id="pageFrom" value="1" min="1"/>
+            </div>
+            <div class="fld">
+              <label>إلى صفحة</label>
+              <input type="number" id="pageTo" value="5" min="1"/>
+            </div>
+            <div class="fld">
+              <label>جودة الصورة</label>
+              <select id="quality">
+                <option value="1.5">عادية</option>
+                <option value="2.0" selected>عالية</option>
+                <option value="2.5">ممتازة</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MAIN -->
+      <div>
+        <div class="upzone" id="dropZone">
+          <input type="file" id="fileInput" accept=".pdf"/>
+          <div class="up-circle">📄</div>
+          <h3>اسحب ملف PDF هنا</h3>
+          <p>أو انقر للاختيار من جهازك</p>
+          <div class="file-ok" id="fileOk"></div>
+        </div>
+
+        <button class="btn-start" id="startBtn" disabled>
+          <div class="sh"></div>
+          ابدأ الاستخراج
+        </button>
+
+        <!-- PROGRESS -->
+        <div class="prog" id="progWrap">
+          <div class="prog-top">
+            <span class="prog-lbl" id="progLbl">جاري التهيئة...</span>
+            <span class="prog-pct" id="progPct">0%</span>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+          <div class="prog-msg">
+            <div class="spin" id="spinner"></div>
+            <span id="progMsg">تحميل محرك OCR...</span>
+          </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="res" id="resWrap">
+          <div class="res-head">
+            <span class="res-title">النص المستخرج</span>
+            <span class="res-ok">اكتمل</span>
+          </div>
+          <div class="mini-stats">
+            <div class="ms"><div class="n" id="sPgs">0</div><div class="l">صفحة</div></div>
+            <div class="ms"><div class="n" id="sWds">0</div><div class="l">كلمة</div></div>
+            <div class="ms"><div class="n" id="sChs">0</div><div class="l">حرف</div></div>
+          </div>
+          <div class="act">
+            <button class="btn-act-gold" id="dlBtn">⬇ تحميل Word</button>
+            <button class="btn-act" id="copyBtn">نسخ النص</button>
+            <button class="btn-act" id="resetBtn">إعادة</button>
+          </div>
+          <div id="pageCards"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="sec-tag">لماذا FLITOX</div>
+    <div class="sec-title">مبني من أجل<br/><em>المحترفين.</em></div>
+    <div class="feat-grid">
+      <div class="feat">
+        <span class="feat-num">— 01</span>
+        <span class="feat-icon">🆓</span>
+        <h3>مجاني للأبد</h3>
+        <p>لا اشتراك، لا بطاقة بنكية، لا قيود على الصفحات. مجاني دائماً.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-num">— 02</span>
+        <span class="feat-icon">🔒</span>
+        <h3>خصوصية تامة</h3>
+        <p>ملفاتك تُعالج محلياً في متصفحك. لا شيء يُرفع لأي خادم أبداً.</p>
+      </div>
+      <div class="feat">
+        <span class="feat-num">— 03</span>
+        <span class="feat-icon">✏️</span>
+        <h3>تعديل مباشر</h3>
+        <p>راجع النص المستخرج وعدّله مباشرة قبل تحميل ملف Word النهائي.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="sec-tag">المطوّر</div>
+    <div class="sec-title">تواصل مع<br/><em>أشرف.</em></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;margin-top:52px">
+      <div>
+        <p style="font-size:15px;color:var(--txt2);line-height:1.9;margin-bottom:32px">مطوّر وصانع أدوات رقمية. بنيت FLITOX لأن استخراج النص العربي من ملفات PDF كان دائماً مشكلة حقيقية — قررت حلّها بالطريقة الصحيحة: مجاناً، خاصاً، وبدون قيود.</p>
+        <a href="https://instagram.com/achraf__gueziri" target="_blank"
+          style="display:flex;align-items:center;gap:16px;padding:20px 24px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r);text-decoration:none;transition:all .3s"
+          onmouseover="this.style.borderColor='rgba(201,169,110,.4)';this.style.background='var(--card2)'"
+          onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--card)'">
+          <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📸</div>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--cream)">Instagram</div>
+            <div style="font-size:13px;color:var(--txt2);margin-top:3px">@achraf__gueziri</div>
+          </div>
+          <div style="margin-right:auto;font-size:18px;color:var(--txt3);transition:color .2s">←</div>
+        </a>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:36px">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;color:var(--cream);margin-bottom:6px">أرسل رسالة</div>
+        <p style="font-size:13px;color:var(--txt2);margin-bottom:24px;line-height:1.7">لديك سؤال أو فكرة؟ يسعدني أن أسمع منك.</p>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:7px">الاسم</label>
+          <input type="text" placeholder="...." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;color:var(--txt);font-size:14px;font-family:'Tajawal',sans-serif;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:7px">البريد الإلكتروني</label>
+          <input type="email" placeholder="example@mail.com" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;color:var(--txt);font-size:14px;font-family:'Tajawal',sans-serif;outline:none;direction:ltr;text-align:left;transition:border-color .2s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:7px">الرسالة</label>
+          <textarea rows="4" placeholder="رسالتك هنا..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;color:var(--txt);font-size:14px;font-family:'Tajawal',sans-serif;outline:none;resize:vertical;transition:border-color .2s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+        </div>
+        <button onclick="toast('✓ تم إرسال رسالتك! شكراً 🙌')" style="width:100%;padding:14px;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;background:var(--gold);color:var(--bg);border:none;border-radius:var(--r);cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .25s" onmouseover="this.style.background='var(--gold2)'" onmouseout="this.style.background='var(--gold)'">إرسال الرسالة</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="ft-logo">FLI<em>TOX</em></div>
+        <p>استخراج PDF العربي بذكاء. مجاني للأبد. خصوصيتك محفوظة.</p>
+      </div>
+      <div class="footer-col">
+        <h4>روابط</h4>
+        <a href="#how">كيف يعمل</a>
+        <a href="#app">تحويل PDF</a>
+        <a href="#features">المميزات</a>
+      </div>
+      <div class="footer-col">
+        <h4>تواصل</h4>
+        <a href="https://instagram.com/achraf__gueziri" target="_blank">Instagram @achraf__gueziri</a>
+        
+        
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 FLITOX — صنعه أشرف </span>
+      <div>مدعوم بـ <span>Tesseract OCR</span> · مفتوح المصدر</div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* ── CITY LIGHTS ── */
+(function(){
+  const c=document.getElementById('lights');
+  const cols=['rgba(201,169,110,.7)','rgba(180,140,80,.5)','rgba(220,200,150,.6)','rgba(100,140,220,.4)','rgba(220,150,100,.3)'];
+  for(let i=0;i<120;i++){
+    const s=document.createElement('span');
+    const size=Math.random()*2.5+.5;
+    s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${40+Math.random()*55}%;background:${cols[Math.floor(Math.random()*cols.length)]};--d:${2+Math.random()*4}s;--del:${Math.random()*4}s;`;
+    c.appendChild(s);
+  }
+})();
+
+/* ── NAV SCROLL ── */
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
+});
+
+/* ── OCR ENGINE ── */
+const $=id=>document.getElementById(id);
+let pdf=null,pages=[],totalPdf=0,worker=null,workerReady=false;
+
+/* ── FILE DROP ── */
+$('dropZone').addEventListener('dragover',e=>{e.preventDefault();$('dropZone').classList.add('drag')});
+$('dropZone').addEventListener('dragleave',()=>$('dropZone').classList.remove('drag'));
+$('dropZone').addEventListener('drop',async e=>{
+  e.preventDefault();$('dropZone').classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f?.type==='application/pdf')await loadPDF(f);
+});
+$('fileInput').addEventListener('change',async()=>{
+  if($('fileInput').files[0])await loadPDF($('fileInput').files[0]);
+});
+
+async function loadPDF(f){
+  try{
+    pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
+    totalPdf=pdf.numPages;
+    $('pageTo').value=Math.min(5,totalPdf);
+    $('pageTo').max=$('pageFrom').max=totalPdf;
+    $('fileOk').style.display='block';
+    $('fileOk').textContent=`✓  ${f.name}  ·  ${totalPdf} صفحة  ·  ${(f.size/1024/1024).toFixed(1)} MB`;
+    $('startBtn').disabled=false;
+    toast('✓ تم تحميل الملف — '+totalPdf+' صفحة متاحة');
+    initWorker().catch(()=>{});
+  }catch(e){toast('خطأ في فتح الملف')}
+}
+
+async function initWorker(){
+  if(workerReady)return;
+  worker=await Tesseract.createWorker('ara',1,{
+    logger:m=>{
+      if(m.status==='loading language traineddata')
+        $('progMsg').textContent='تحميل بيانات اللغة العربية... '+Math.round((m.progress||0)*100)+'%';
+    }
+  });
+  await worker.setParameters({tessedit_pageseg_mode:Tesseract.PSM.AUTO,preserve_interword_spaces:'1'});
+  workerReady=true;
+}
+
+async function renderPage(n,scale){
+  const pg=await pdf.getPage(n);
+  const vp=pg.getViewport({scale:parseFloat(scale)});
+  const cv=document.createElement('canvas');
+  cv.width=vp.width;cv.height=vp.height;
+  await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
+  return cv;
+}
+
+$('startBtn').onclick=async()=>{
+  if(!pdf)return;
+  const from=Math.max(1,parseInt($('pageFrom').value)||1);
+  const to=Math.min(parseInt($('pageTo').value)||5,totalPdf);
+  const scale=$('quality').value;
+  if(from>to)return toast('نطاق الصفحات غير صحيح');
+
+  $('startBtn').disabled=true;
+  pages=[];$('pageCards').innerHTML='';
+  $('resWrap').style.display='none';
+  $('progWrap').style.display='block';
+  $('progFill').style.width='0%';
+  $('progLbl').textContent='جاري التهيئة...';
+  $('progPct').textContent='0%';
+  $('spinner').style.display='block';
+
+  try{await initWorker()}
+  catch(e){toast('فشل تحميل محرك OCR');$('startBtn').disabled=false;return}
+
+  const total=to-from+1;let done=0;
+
+  for(let p=from;p<=to;p++){
+    $('progLbl').textContent=`قراءة الصفحة ${p} من ${to}...`;
+    $('progMsg').textContent=`معالجة الصفحة ${p}...`;
+    let text='',qual='ok';
+    try{
+      const cv=await renderPage(p,scale);
+      const{data}=await worker.recognize(cv);
+      text=data.text.trim();
+      if(!text||text.length<4){text='[لا يوجد نص في هذه الصفحة]';qual='w';}
+      if(data.confidence<30&&text.length>5)qual='w';
+    }catch(e){text=`[خطأ: ${e.message}]`;qual='e'}
+
+    pages.push({page:p,text,qual});
+    done++;
+    const pct=Math.round(done/total*100);
+    $('progFill').style.width=pct+'%';
+    $('progPct').textContent=pct+'%';
+
+    const card=document.createElement('div');
+    card.className='pg-card';
+    card.innerHTML=`
+      <div class="pg-hd">
+        <span class="pg-n">صفحة ${p}</span>
+        <div class="pg-dot-wrap"><div class="pg-dot ${qual==='ok'?'':qual}"></div><span>${qual==='ok'?'تم الاستخراج':qual==='w'?'دقة منخفضة':'خطأ'}</span></div>
+      </div>
+      <textarea class="pg-txt" rows="5" spellcheck="false" data-page="${p}" dir="rtl" style="text-align:right">${esc(text)}</textarea>`;
+    $('pageCards').appendChild(card);
+    card.scrollIntoView({behavior:'smooth',block:'nearest'});
+    card.querySelector('textarea').addEventListener('input',function(){
+      const pg=pages.find(x=>x.page===parseInt(this.dataset.page));
+      if(pg)pg.text=this.value;
+    });
+  }
+
+  $('spinner').style.display='none';
+  $('progLbl').textContent='اكتمل الاستخراج ✓';
+  const full=pages.map(x=>x.text).join(' ');
+  $('sPgs').textContent=total;
+  $('sWds').textContent=full.split(/\s+/).filter(Boolean).length.toLocaleString('ar-MA');
+  $('sChs').textContent=full.length.toLocaleString('ar-MA');
+  $('resWrap').style.display='block';
+  $('startBtn').disabled=false;
+  toast('✓ اكتمل الاستخراج — '+total+' صفحة');
+};
+
+$('dlBtn').onclick=()=>{
+  const body=pages.map(x=>`<div class="pg"><div class="pg-n">صفحة ${x.page}</div>${x.text.split('\n').filter(l=>l.trim()).map(l=>`<p>${esc(l)}</p>`).join('')}</div>`).join('');
+  const html=`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><style>body{font-family:'Times New Roman',Arial,serif;font-size:14pt;line-height:2;direction:rtl;text-align:right;margin:2.5cm 3cm;color:#111}.pg{margin-bottom:32pt;page-break-inside:avoid}.pg-n{font-size:10pt;color:#888;border-bottom:.5pt solid #ddd;padding-bottom:5pt;margin-bottom:14pt}p{margin-bottom:9pt;text-indent:28pt}</style></head><body>${body}</body></html>`;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+html],{type:'application/msword;charset=utf-8'}));
+  a.download='FLITOX_output.doc';a.click();
+  toast('جاري التحميل...');
+};
+
+$('copyBtn').onclick=()=>{
+  navigator.clipboard.writeText(pages.map(x=>`--- صفحة ${x.page} ---\n${x.text}`).join('\n\n'))
+    .then(()=>toast('✓ تم نسخ النص'));
+};
+
+$('resetBtn').onclick=()=>{
+  pdf=null;pages=[];totalPdf=0;
+  $('fileOk').style.display='none';$('fileInput').value='';
+  $('pageCards').innerHTML='';
+  $('progWrap').style.display='none';$('resWrap').style.display='none';
+  $('progFill').style.width='0%';$('startBtn').disabled=true;
+  $('spinner').style.display='block';
+  toast('جاهز لملف جديد');
+};
+
+function toast(msg){
+  const t=$('toast');t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+</script>
+</body>
+</html>
